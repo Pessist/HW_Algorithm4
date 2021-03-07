@@ -55,9 +55,11 @@ public class BechmarkClass
     {
         for (int i = 0; i < n; i++)
         {
-            myHashSet.Add(RandomUtil.GetRandomString());
-            myHashSet.CopyTo(randomStringArray);
+            myHashSet.Add(RandomUtil.GetRandomString());            
         }
+
+        myHashSet.CopyTo(randomStringArray);
+
         return randomStringArray;
     }
 
