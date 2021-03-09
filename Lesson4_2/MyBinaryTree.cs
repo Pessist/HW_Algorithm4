@@ -81,138 +81,135 @@ namespace Lesson4_2
             Root.Print();
         }
 
+        public TreeNode GetSuccessor(TreeNode delNode)
+        {
+            TreeNode successorParent = delNode;
+            TreeNode successor = delNode;
+            TreeNode current = delNode.RightChild;
+
+            while (!(current == null))
+            {
+                successorParent = current;
+                successor = current;
+                current = current.LeftChild;
+            }
+
+            if (!(successor == delNode.RightChild))
+            {
+                successorParent.LeftChild = successor.RightChild;
+                successor.RightChild = delNode.RightChild;
+            }
+            successor.LeftChild = delNode.LeftChild;
+            return successor;
+        }
+
 
         public void RemoveItem(int value)
         {
-            //Проверяем, существует ли данный узел
-            TreeNode deleteTreeNode = GetNodeByValue(value);
 
-            if (deleteTreeNode == null)
+            TreeNode current = root;
+            TreeNode parent = root;
+            bool isLeftChild = false;
+
+            if (current == null)
             {
-                //Если узла не существует, вернем false
-                return;
-            }
-
-            TreeNode currentTree;
-
-            //Если удаляем корень
-            if (deleteTreeNode == root)
-            {
-                if (deleteTreeNode.RightChild != null)
-                {
-                    currentTree = deleteTreeNode.RightChild;
-                }
-                else currentTree = deleteTreeNode.LeftChild;
-
-                while (currentTree.LeftChild != null)
-                {
-                    currentTree = currentTree.LeftChild;
-                }
-                int temp = currentTree.Value;
-                RemoveItem(temp);
-                deleteTreeNode.Value = temp;
-
                 return;
             }
 
 
-            //Удаление листьев
-            if (deleteTreeNode.LeftChild == null && deleteTreeNode.RightChild == null && deleteTreeNode.Parent != null)
+            while (current != null && current.Value != value)
             {
-                if (deleteTreeNode == deleteTreeNode.Parent.LeftChild)
-                    deleteTreeNode.Parent.LeftChild = null;
+                parent = current;
+
+                if (value < current.Value)
+                {
+                    current = current.LeftChild;
+                    isLeftChild = true;
+                }
                 else
                 {
-                    deleteTreeNode.Parent.RightChild = null;
+                    current = current.RightChild;
+                    isLeftChild = false;
                 }
+            }
+
+            if (current == null)
+            {
                 return;
             }
 
-            //Удаление узла, имеющего левое поддерево, но не имеющее правого поддерева
-            if (deleteTreeNode.LeftChild != null && deleteTreeNode.RightChild == null)
+            if (current.RightChild == null && current.LeftChild == null)
             {
-                //Меняем родителя
-                deleteTreeNode.LeftChild.Parent = deleteTreeNode.Parent;
-                if (deleteTreeNode == deleteTreeNode.Parent.LeftChild)
+                if (current == root)
                 {
-                    deleteTreeNode.Parent.LeftChild = deleteTreeNode.LeftChild;
+                    root = null;
                 }
-                else if (deleteTreeNode == deleteTreeNode.Parent.RightChild)
-                {
-                    deleteTreeNode.Parent.RightChild = deleteTreeNode.LeftChild;
-                }
-                return;
-            }
-
-            //Удаление узла, имеющего правое поддерево, но не имеющее левого поддерева
-            if (deleteTreeNode.LeftChild == null && deleteTreeNode.RightChild != null)
-            {
-                //Меняем родителя
-                deleteTreeNode.RightChild.Parent = deleteTreeNode.Parent;
-                if (deleteTreeNode == deleteTreeNode.Parent.LeftChild)
-                {
-                    deleteTreeNode.Parent.LeftChild = deleteTreeNode.RightChild;
-                }
-                else if (deleteTreeNode == deleteTreeNode.Parent.RightChild)
-                {
-                    deleteTreeNode.Parent.RightChild = deleteTreeNode.RightChild;
-                }
-                return;
-            }
-
-            //Удаляем узел, имеющий поддеревья с обеих сторон
-            if (deleteTreeNode.RightChild != null && deleteTreeNode.LeftChild != null)
-            {
-                currentTree = deleteTreeNode.RightChild;
-
-                while (currentTree.LeftChild != null)
-                {
-                    currentTree = currentTree.LeftChild;
-                }
-
-                //Если самый левый элемент является первым потомком
-                if (currentTree.Parent == deleteTreeNode)
-                {
-                    currentTree.LeftChild = deleteTreeNode.LeftChild;
-                    deleteTreeNode.LeftChild.Parent = currentTree;
-                    currentTree.Parent = deleteTreeNode.Parent;
-                    if (deleteTreeNode == deleteTreeNode.Parent.LeftChild)
-                    {
-                        deleteTreeNode.Parent.LeftChild = currentTree;
-                    }
-                    else if (deleteTreeNode == deleteTreeNode.Parent.RightChild)
-                    {
-                        deleteTreeNode.Parent.RightChild = currentTree;
-                    }
-                    return;
-                }
-                //Если самый левый элемент НЕ является первым потомком
                 else
                 {
-                    if (currentTree.RightChild != null)
+                    if (isLeftChild)
                     {
-                        currentTree.RightChild.Parent = currentTree.Parent;
+                        parent.LeftChild = null;
                     }
-                    currentTree.Parent.LeftChild = currentTree.RightChild;
-                    currentTree.RightChild = deleteTreeNode.RightChild;
-                    currentTree.LeftChild = deleteTreeNode.LeftChild;
-                    deleteTreeNode.LeftChild.Parent = currentTree;
-                    deleteTreeNode.RightChild.Parent = currentTree;
-                    currentTree.Parent = deleteTreeNode.Parent;
-                    if (deleteTreeNode == deleteTreeNode.Parent.LeftChild)
+                    else
                     {
-                        deleteTreeNode.Parent.LeftChild = currentTree;
+                        parent.RightChild = null;
                     }
-                    else if (deleteTreeNode == deleteTreeNode.Parent.RightChild)
-                    {
-                        deleteTreeNode.Parent.RightChild = currentTree;
-                    }
-
-                    return;
                 }
             }
-            return;
+            else if (current.RightChild == null)
+            {
+                if (current == root)
+                {
+                    root = current.LeftChild;
+                }
+                else
+                {
+                    if (isLeftChild)
+                    {
+                        parent.LeftChild = current.LeftChild;
+                    }
+                    else
+                    {
+                        parent.RightChild = current.LeftChild;
+                    }
+                }
+            }
+            else if (current.LeftChild == null)
+            {
+                if (current == root)
+                {
+                    root = current.RightChild;
+                }
+                else
+                {
+                    if (isLeftChild)
+                    {
+                        parent.LeftChild = current.RightChild;
+                    }
+                    else
+                    {
+                        parent.RightChild = current.RightChild;
+                    }
+                }
+            }
+            else
+            {
+                TreeNode successor = GetSuccessor(current);
 
+                if (current == root)
+                {
+                    root = successor;
+                }
+                else if (isLeftChild)
+                {
+                    parent.LeftChild = successor;
+                }
+                else
+                {
+                    parent.RightChild = successor;
+                }
+
+            }
         }
 
 
