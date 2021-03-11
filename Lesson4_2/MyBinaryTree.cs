@@ -72,13 +72,11 @@ namespace Lesson4_2
             }
         }
 
-
         public TreeNode GetRoot() => root;
 
-        public TreeNode Root { get { return root; } }
         public void PrintTree()
         {
-            Root.Print();
+            root.Print();
         }
 
         public TreeNode GetSuccessor(TreeNode delNode)
